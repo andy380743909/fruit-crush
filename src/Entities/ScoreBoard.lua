@@ -15,8 +15,8 @@ function ScoreBoard:init(level,time,target)
 
 	self.scoreQuad=self:initProgressBar(self.maxScoreQuads)
 	self.timeQuad=self:initProgressBar(self.maxTimeQuads)
-
-	Timer.every(1,function() self:update() end)
+    
+	self.timer = Timer.every(1,function() self:update() end)
 end
 
 function ScoreBoard:initProgressBar(n)
@@ -48,6 +48,7 @@ function ScoreBoard:update()
 	local Game=gStateMachine.current
 	self.time=self.time-1
 	if self.time<=0 then
+        print("lose, level:" .. self.level)
 		if Game.lose then Game:lose() end
 	end
 end
@@ -77,6 +78,7 @@ function ScoreBoard:renderProgressBar()
 		],
 		self.x+24,self.y+240
 	)
+    print(self.level .. self.time)
 end
 
 function ScoreBoard:renderSeperators()

@@ -107,7 +107,7 @@ end
 function Board:swapFruit(fruit,dir)
 	if self.tweening then return end
 	if (fruit.x-self.x)%64~=0 or (fruit.y-self.y)%64~=0 then
-		error('boy something is wrong')
+		error('boy something is wrong. '.. 'x: '.. fruit.x .. 'y:' .. fruit.y)
 		--Boy something is going wrong, return immediately!!
 		return
 	end
@@ -238,12 +238,14 @@ end
 
 --returns tx,ty and dir as hint!
 function Board:getHints()
-
-	for x=1,8 do
+    --self:init(264, 59)
+    --return 0,0,'none'
+    
+    for x=1,8 do
 		for y=1,8 do
 			if self:sameFruit(y,x,y+1,x, y+3,x) then
 				return x,y+3,'up'
-			elseif self:sameFruit(y,x,y+2,x, y+3,x) then		
+			elseif self:sameFruit(y,x,y+2,x, y+3,x) then
 				return x,y,'down'
 			elseif self:sameFruit(y,x,y+2,x, y+1,x-1) then
 				return x-1,y+1,'right'
@@ -283,7 +285,8 @@ function Board:getHints()
 	end
 
 	-- Oops no more matches (possibly), restart
-	self:init()
+	self:init(264, 59)
+    return 0,0,'none'
 end
 
 function Board:getFruit(ty,tx)

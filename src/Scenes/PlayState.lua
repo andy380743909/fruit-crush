@@ -11,6 +11,11 @@ function PlayState:enter(params)
 	self.justMousePressed=false
 end
 
+function PlayState:exit()
+    print("Level: ".. self.scoreBoard.level .. "PlayState:exit, timer remove " .. tostring(self.scoreBoard.timer) )
+    self.scoreBoard.timer:remove()
+end
+
 function PlayState:pause()
 	gStateMachine:switch('pause',{
 		board=self.board,
@@ -33,8 +38,10 @@ function PlayState:update(dt)
 	self.lastTimeMousePressed=self.lastTimeMousePressed+dt
 	if self.lastTimeMousePressed>5 and self.hintDisabled then
 		local x,y,dir=self.board:getHints()
-		x,y=self.board.x+(x-1)*64,self.board.y+(y-1)*64
-		self.psystem:newHintParticle(x,y,dir)
+        if  dir ~= 'none' then
+            x,y=self.board.x+(x-1)*64,self.board.y+(y-1)*64
+            self.psystem:newHintParticle(x,y,dir)
+        end
 		self.hintDisabled=false
 	end
 end
@@ -64,8 +71,10 @@ function PlayState:mouseReleased(...)
 	if not self.board.tweening and euler.pointInRect(self.scoreBoard.x,self.scoreBoard.y-130,gImages.hintWindow:getWidth(),gImages.hintWindow:getHeight(),love.mouse.getPosition()) then
 		if self.hintDisabled then
 			local x,y,dir=self.board:getHints()
-			x,y=self.board.x+(x-1)*64,self.board.y+(y-1)*64
-			self.psystem:newHintParticle(x,y,dir)
+            if  dir ~= 'none' then
+                x,y=self.board.x+(x-1)*64,self.board.y+(y-1)*64
+                self.psystem:newHintParticle(x,y,dir)
+            end
 			self.hintDisabled=false
 		end
 	end
@@ -108,12 +117,17 @@ function RobotCursor.newStage()
 end
 
 function PlayState:win()
+    
+    --self.scoreBoard.timer:remove()
+
 	local board=self.board
 	self.dontUpdateBoard=true
 	board.tweening=true
+    
 	flux.tween(board,2,{
 		op=0
 	}):oncomplete(function()
+        
 		gStateMachine:switch('roundOver',{
 			level=self.scoreBoard.level+1,
 			target=self.scoreBoard.targetScore+100,
@@ -123,6 +137,18 @@ function PlayState:win()
 end
 
 function PlayState:lose()
+
+print("Call stack:")
+local level = 0  -- Start from level 2 to skip the foo() and bar() calls
+while true do
+    local info = debug.getinfo(level, "nSl")
+    if not info then break end
+    print(string.format("%d. %s:%d - %s", level - 1, info.source, info.currentline, info.name or "unknown"))
+    level = level + 1
+end
+    
+    --self.scoreBoard.timer:remove()
+
 	local board=self.board
 	self.dontUpdateBoard=true
 	board.tweening=true

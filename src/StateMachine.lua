@@ -20,7 +20,16 @@ end
 
 function StateMachine:change(stateName, enterParams)
 	assert(self.states[stateName],"Oops! State Doesn't Exist")
-	self.current:exit()
+	print(stateName)
+    print("Call stack:")
+    local level = 0  -- Start from level 2 to skip the foo() and bar() calls
+    while true do
+        local info = debug.getinfo(level, "nSl")
+        if not info then break end
+        print(string.format("%d. %s:%d - %s", level - 1, info.source, info.currentline, info.name or "unknown"))
+        level = level + 1
+    end
+    self.current:exit()
 	self.current = self.states[stateName]()
 	self.current:enter(enterParams)
 	return self
